@@ -40,6 +40,11 @@ class SubsManager:
         except UnicodeDecodeError as e:
             exit(f'{e}\nTry changing encoding manually or allow "chardet" lib to determine it with: --encoding auto')
         self.subs = [Sub(sub.text, Sub.to_plaintext(sub)) for sub in self.origin_subs]
+        self.top_bottom_subs = pysubs2.SSAFile()
+        self.top_bottom_subs.styles = {
+            "bottom": pysubs2.SSAStyle(alignment=pysubs2.Alignment.BOTTOM_CENTER, primarycolor=pysubs2.Color(204, 119, 0, 0), marginv=5, outline=1, shadow=0),
+            "top": pysubs2.SSAStyle(alignment=pysubs2.Alignment.TOP_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 25), marginv=5, outline=1, shadow=0),
+        }
 
     def extract_line_styling(self):
         logging.info('Extracting individual line styling..')
@@ -66,6 +71,10 @@ class SubsManager:
                 secondary = ""
 
             origin_sub.text = f'{sub.open_style}{main}{secondary}{sub.close_style}'
+            s1 = pysubs2.SSAEvent(origin_sub.start, origin_sub.end, main, style='bottom')
+            s2 = pysubs2.SSAEvent(origin_sub.start, origin_sub.end, secondary, style='top')
+            self.top_bottom_subs.append(s1)
+            self.top_bottom_subs.append(s2)
 
     def save_subs(self, subs_out: str):
         self.origin_subs.save(subs_out)
