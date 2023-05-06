@@ -43,7 +43,7 @@ class SubsManager:
         self.top_bottom_subs = pysubs2.SSAFile()
         self.top_bottom_subs.styles = {
             "bottom": pysubs2.SSAStyle(alignment=pysubs2.Alignment.BOTTOM_CENTER, primarycolor=pysubs2.Color(204, 119, 0, 0), marginv=5, outline=0.5, shadow=0),
-            "top": pysubs2.SSAStyle(alignment=pysubs2.Alignment.TOP_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 25), marginv=5, outline=0.5, shadow=0),
+            "top": pysubs2.SSAStyle(alignment=pysubs2.Alignment.TOP_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 25), marginv=1, outline=0.5, shadow=0),
         }
 
     def extract_line_styling(self):
@@ -66,13 +66,15 @@ class SubsManager:
             if merge:
                 secondary = Sub.merge_multiline(secondary, int(char_limit * 100 / secondary_scale))
                 secondary = SubsManager._replace_with_capital_newline(secondary)
+                secondary_text = secondary
                 secondary = SubsManager._afterstyle(secondary, secondary_scale, secondary_alpha)
             else:
                 secondary = ""
+                secondary_text = ""
 
             origin_sub.text = f'{sub.open_style}{main}{secondary}{sub.close_style}'
             s1 = pysubs2.SSAEvent(origin_sub.start, origin_sub.end, main, style='bottom')
-            s2 = pysubs2.SSAEvent(origin_sub.start, origin_sub.end, secondary, style='top')
+            s2 = pysubs2.SSAEvent(origin_sub.start, origin_sub.end, secondary_text, style='top')
             self.top_bottom_subs.append(s1)
             self.top_bottom_subs.append(s2)
 
