@@ -29,14 +29,14 @@ def main():
     parser.add_argument('output', type=str, help='Generated translated subtitle file.')
     parser.add_argument('--encoding', default='utf-8', type=str,
                         help='Input file encoding, which defaults to "utf-8". To determine it automatically use "auto"')
-    parser.add_argument('--to_lang', default='es', type=str, help='Language to which translate to.')
+    parser.add_argument('--to_lang', default='vi', type=str, help='Language to which translate to.')
     parser.add_argument('--pronounce_original', action='store_true',
                         help='Use pronunciation rather than writing form for origin subs e.g. useful for Japanese')
     parser.add_argument('--pronounce_translated', action='store_true',
                         help='Use pronunciation rather than writing form for translated subs e.g. useful for Japanese')
-    parser.add_argument('--merge', action='store_true',
+    parser.add_argument('--merge', action='store_true', default=True,
                         help='Set to see both, the original (at bottom) and the translated (on top), subtitles.')
-    parser.add_argument('--reverse', action='store_true',
+    parser.add_argument('--reverse', action='store_true', default=True,
                         help='Display original subs on top and translated at the bottom instead, when --merge is set.')
     parser.add_argument('--secondary_scale', default=80, type=int,
                         help='Specify the secondary subs scale factor where 100 is its original size.')
