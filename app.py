@@ -10,6 +10,7 @@ import logging
 import sys
 from typing import List
 import os
+import pysubs2
 
 """
 Future Development:
@@ -22,11 +23,11 @@ def main():
     parser = argparse.ArgumentParser(
         description='It is a tool to translate movie subtitles from one language into another, or even show multiple '
                     'language subtitles together.',
-        usage='python translatesubs.py video.mkv output.ass --merge --to_lang fr')
-    parser.add_argument('input', type=str,
+        usage='python translatesubs.py video.mkv output.ass --merge --to_lang vi')
+    parser.add_argument('input', default='', nargs="?", type=str,
                         help='Input file to translate; By default it is a subtitle file but if flag --video_file is'
                              ' set, then this is video file name.')
-    parser.add_argument('output', type=str, help='Generated translated subtitle file.')
+    parser.add_argument('output', default='', nargs="?", type=str, help='Generated translated subtitle file.')
     parser.add_argument('--encoding', default='utf-8', type=str,
                         help='Input file encoding, which defaults to "utf-8". To determine it automatically use "auto"')
     parser.add_argument('--to_lang', default='vi', type=str, help='Language to which translate to.')
@@ -38,9 +39,9 @@ def main():
                         help='Set to see both, the original (at bottom) and the translated (on top), subtitles.')
     parser.add_argument('--reverse', action='store_true', default=True,
                         help='Display original subs on top and translated at the bottom instead, when --merge is set.')
-    parser.add_argument('--secondary_scale', default=80, type=int,
+    parser.add_argument('--secondary_scale', default=70, type=int,
                         help='Specify the secondary subs scale factor where 100 is its original size.')
-    parser.add_argument('--secondary_alpha', default=50, type=int,
+    parser.add_argument('--secondary_alpha', default=25, type=int,
                         help='Specify the secondary subs opacity in percent, where 100 is completely transparent.')
     parser.add_argument('--line_char_limit', default=30, type=int,
                         help='Decide if keep multiple, often short, lines or merge them into one instead. Best '
@@ -84,25 +85,56 @@ def main():
     logging.info(f'Using logging level {logging.getLogger()} - lvl {logging.getLogger().level}.')
 
     # Prepare original subs: extract text and styling
-    filename = get_subs_file(args)
-    subs_manager = SubsManager(filename=filename, encoding=get_encoding(args.encoding, filename))
-    subs_manager.extract_line_styling()
+    if args.input:
+        filenames = [get_subs_file(args)]
+    else:
+        current_folder = os.getcwd()
+        filenames = [i for i in os.listdir(current_folder) if i.lower().endswith('.srt')]
+    if len(filenames) > 1:
+        args.output = ''
 
-    # Perform translation: prepare extracted subs for translating and try different separators to see which will work
-    translator = get_translator(args.translator)
-    language_manager = get_language_manager(args.to_lang, args.ignore_line_ends, translator)
-    language_manager.prep_for_trans(subs_manager.just_text())
-    original, translated = translate(language_manager, separators_to_try(args.separator),
-                                     args.pronounce_original, args.pronounce_translated)
+    for filename in filenames:
+        subs_manager = SubsManager(filename=filename, encoding=get_encoding(args.encoding, filename))
+        subs_manager.extract_line_styling()
 
-    # To display firstly original and translated below instead
-    if args.reverse:
-        original, translated = translated, original
+        # Perform translation: prepare extracted subs for translating and try different separators to see which will work
+        translator = get_translator(args.translator)
+        language_manager = get_language_manager(args.to_lang, args.ignore_line_ends, translator)
+        language_manager.prep_for_trans(subs_manager.just_text())
+        original, translated = translate(language_manager, separators_to_try(args.separator),
+                                        args.pronounce_original, args.pronounce_translated)
 
-    subs_manager.update_subs(main_subs=translated, secondary_subs=original,
-                             merge=args.merge, secondary_scale=args.secondary_scale,
-                             secondary_alpha=args.secondary_alpha, char_limit=args.line_char_limit)
-    subs_manager.save_subs(args.output)
+        # To display firstly original and translated below instead
+        if args.reverse:
+            original, translated = translated, original
+
+        subs_manager.update_subs(main_subs=translated, secondary_subs=original,
+                                merge=args.merge, secondary_scale=args.secondary_scale,
+                                secondary_alpha=args.secondary_alpha, char_limit=args.line_char_limit)
+        subs_manager.origin_subs.styles["Default"].primarycolor = pysubs2.ssastyle.Color(204, 119, 0, 0)
+        subs_manager.origin_subs.styles["Default"].outline = 0.5
+        subs_manager.origin_subs.styles["Default"].shadow = 0
+        subs_manager.origin_subs.styles["Default"].marginv = 5
+
+        if args.output:
+            output1 = args.output
+            output2 = output1.replace('.ass', '.dual.ass')
+        else:
+            basename = os.path.basename(filename)
+            title = basename.rsplit('.', 1)[0]
+            if title.lower().endswith('.en') or title.lower().endswith('.english'):
+                title = title.rsplit('.', 1)[0]
+            if title.lower().endswith('_en') or title.lower().endswith('_english'):
+                title = title.rsplit('_', 1)[0]
+            for i in range(10):
+                if title.endswith(f'.{i}'):
+                    title = title.rsplit('.', 1)[0]
+                    break
+            
+            output1 = f'{title}.1.{args.to_lang}.ass'
+            output2 = f'{title}.2.{args.to_lang}.ass'
+        subs_manager.origin_subs.save(output1)
+        subs_manager.top_bottom_subs.save(output2)
     print('Finished!')
 
 
