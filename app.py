@@ -39,7 +39,7 @@ def main():
                         help='Set to see both, the original (at bottom) and the translated (on top), subtitles.')
     parser.add_argument('--reverse', action='store_true', default=True,
                         help='Display original subs on top and translated at the bottom instead, when --merge is set.')
-    parser.add_argument('--secondary_scale', default=70, type=int,
+    parser.add_argument('--secondary_scale', default=50, type=int,
                         help='Specify the secondary subs scale factor where 100 is its original size.')
     parser.add_argument('--secondary_alpha', default=25, type=int,
                         help='Specify the secondary subs opacity in percent, where 100 is completely transparent.')
