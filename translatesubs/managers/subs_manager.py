@@ -42,8 +42,8 @@ class SubsManager:
         self.subs = [Sub(sub.text, Sub.to_plaintext(sub)) for sub in self.origin_subs]
         self.top_bottom_subs = pysubs2.SSAFile()
         self.top_bottom_subs.styles = {
-            "bottom": pysubs2.SSAStyle(alignment=pysubs2.Alignment.BOTTOM_CENTER, primarycolor=pysubs2.Color(204, 119, 0, 0), marginv=5, outline=0.5, shadow=0),
-            "top": pysubs2.SSAStyle(alignment=pysubs2.Alignment.TOP_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 25), marginv=1, outline=0.5, shadow=0),
+            "bottom": pysubs2.SSAStyle(alignment=pysubs2.Alignment.BOTTOM_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 0), marginv=5, outline=1, shadow=1),
+            "top": pysubs2.SSAStyle(alignment=pysubs2.Alignment.TOP_CENTER, primarycolor=pysubs2.Color(255, 255, 255, 25), marginv=1, outline=1, shadow=1),
         }
 
     def extract_line_styling(self):

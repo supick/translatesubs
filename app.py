@@ -111,9 +111,9 @@ def main():
         subs_manager.update_subs(main_subs=translated, secondary_subs=original,
                                 merge=args.merge, secondary_scale=args.secondary_scale,
                                 secondary_alpha=args.secondary_alpha, char_limit=args.line_char_limit)
-        subs_manager.origin_subs.styles["Default"].primarycolor = pysubs2.ssastyle.Color(204, 119, 0, 0)
-        subs_manager.origin_subs.styles["Default"].outline = 0.5
-        subs_manager.origin_subs.styles["Default"].shadow = 0
+        # subs_manager.origin_subs.styles["Default"].primarycolor = pysubs2.ssastyle.Color(204, 119, 0, 0)
+        subs_manager.origin_subs.styles["Default"].outline = 1
+        subs_manager.origin_subs.styles["Default"].shadow = 1
         subs_manager.origin_subs.styles["Default"].marginv = 1
 
         if args.output:
